@@ -9,7 +9,7 @@
 // 2. Compute the transformation taking the standard L-set to the given one
 // 3. pullback
 
-include "lines_func.m";
+load "lines_func.m";
 
 ZZ := Integers();
 k := Rationals();

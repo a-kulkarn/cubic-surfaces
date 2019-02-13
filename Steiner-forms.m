@@ -6,23 +6,6 @@
 load "lines_func.m";
 load "combinatorics_util.m";
 
-// Calculate the 27 lines
-ZZ := Integers();
-k := Rationals();
-
-R<x0,x1,x2,x3> := PolynomialRing(k,4);
-
-// Bernd's cubic.
-f := 16384 * x0^3 + 32 * x0^2 * x1 + x0 * x1^2 + 8 * x1^3 + x0^2 * x2
-  + 32 * x0 * x1 * x2 + 16384 * x1^2 * x2 + 4194304 * x0 * x2^2
-  + 67108864 * x1 * x2^2 + 281474976710656 * x2^3
-  + 256 * x0^2 * x3 + 2 * x0 * x1 * x3 + 2 * x1^2 * x3
-  + 4 * x0 * x2 * x3 + 512 * x1 * x2 * x3 + 67108864 * x2^2 * x3
-	   + 8 * x0 * x3^2 + 32 * x2 * x3^2 + x3^3 + x1 * x3^2;
-
-// Each line is expressed as a 4x2 matrix. i.e, Points_on_lines*Lines = 0.
-time lines, Qp := FormsOfpAdicLines(f);
-
 
 // Finds a double-six. That is, a pair of sets {ai},{bj} of 6 pairwise orthogonal exceptional curves
 // such that ai.bj = 1 iff i neq j.
@@ -64,8 +47,6 @@ function DoubleSix(lines)
     
     return as,bs,C;
 end function;
-
-as,bs,C := DoubleSix(lines);
 
 
 /*
@@ -207,14 +188,10 @@ function TriederpaarIndices(a,b,C)
     return triederpaars;
 end function;
 
-triederpaar_index_list := TriederpaarIndices(as,bs,C);
-
-// Need a new parent for linear forms
-Rp<x0,x1,x2,x3> := ChangeRing(R, Qp);
-
 //
+// `Rp` is the future parent of the linear forms.
 // `M` is the matrix of indices of the 9 lines in one of Steiner's 3x3 matrices.
-function TriederpaarFromIndex(lines, M)
+function TriederpaarFromIndex(Rp,lines, M)
 
     K := BaseRing(Rp);
     
@@ -232,9 +209,36 @@ function TriederpaarFromIndex(lines, M)
     return {row_triple, col_triple};
 end function;
 
-triederpaars := [TriederpaarFromIndex(lines, tridp_inds) : tridp_inds in triederpaar_index_list];
+//********************************************************************************************
+// START MAIN SCRIPT
 
-// To have cubics, we multiply the three linear forms in the triederpaars together.
+ZZ := Integers();
+k := Rationals();
+
+R<x0,x1,x2,x3> := PolynomialRing(k,4);
+
+// Bernd's cubic.
+f := 16384 * x0^3 + 32 * x0^2 * x1 + x0 * x1^2 + 8 * x1^3 + x0^2 * x2
+  + 32 * x0 * x1 * x2 + 16384 * x1^2 * x2 + 4194304 * x0 * x2^2
+  + 67108864 * x1 * x2^2 + 281474976710656 * x2^3
+  + 256 * x0^2 * x3 + 2 * x0 * x1 * x3 + 2 * x1^2 * x3
+  + 4 * x0 * x2 * x3 + 512 * x1 * x2 * x3 + 67108864 * x2^2 * x3
+	   + 8 * x0 * x3^2 + 32 * x2 * x3^2 + x3^3 + x1 * x3^2;
+
+// Each line is expressed as a 4x2 matrix. i.e, Points_on_lines*Lines = 0.
+time lines, K := FormsOfpAdicLines(f);
+
+// Need a new parent for linear forms
+Rp<x0,x1,x2,x3> := ChangeRing(R, K);
+
+
+as,bs,C := DoubleSix(lines);
+triederpaar_index_list := TriederpaarIndices(as,bs,C);
+
+triederpaars := [TriederpaarFromIndex(Rp, lines, tridp_inds) : tridp_inds in triederpaar_index_list];
+
+// To get the cubic terms in the Steiner forms,
+// we multiply the three linear forms in the triederpaars together.
 summands := [ [ &*tri : tri in tridp] : tridp in triederpaars];
 
 // We confirm that there exist scalar coefficients A,B such that
@@ -243,17 +247,22 @@ summands := [ [ &*tri : tri in tridp] : tridp in triederpaars];
 // (the coefficients are of course dependent on the particular triederpaar.)
 
 mons := Monomials( (&+Variables(Rp))^3 );
-V := VectorSpace(Qp,#mons);
+V := VectorSpace(K,#mons);
 
 Ws := [ sub<V | [Vector([ MonomialCoefficient(g,m) : m in mons]) : g in aexprs]>
 	: aexprs in summands];
 
 assert #Seqset(Ws) eq 120; // check that the 120 triederpaars are indeed inequivalent.
 
-fvec := Vector(Qp, [ MonomialCoefficient(Rp ! f,m) : m in mons]);
+
 
 // The moment of truth.
+fvec := V ! Vector(K, [ MonomialCoefficient(Rp ! f,m) : m in mons]);
 assert &and [ fvec in W : W in Ws];
+
+print "Computation terminated correctly. Linear forms in Steiner representation given by
+      identifier `triederpaars`, up to scaling by a constant. 
+      Constants not computed due to lazyness.";
 
 // Solving for the particular coefficients is linear algebra. We leave this to the reader of
 // the code.
