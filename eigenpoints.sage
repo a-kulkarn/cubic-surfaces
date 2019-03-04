@@ -63,6 +63,10 @@ assert all([q(pt + [lamb])==0 for b in BK for pt,lamb in zip(pts,lambs) for q in
 # Start looking for syzygies
 RP3.<x,y,z,w> = PolynomialRing(K,4)
 
+# first, verify that f is actually smooth
+assert ProjectiveSpace(RP3).subscheme(f.change_ring(K)).is_smooth()
+
+
 # In P3, no subset of 4 points lie on a common hyperplane.
 
 sub_inds = Subsets( range(len(pts)) ,4)
@@ -99,27 +103,44 @@ print("There IS an extra cubic syzygy!")
 #J = RP3.ideal(ker_cubics)
 
 #
-# Check for extra quartics.
+# Check for extra syzygies in higher degrees.
 
-Bmons = list(set((RP3.irrelevant_ideal()^4).gens()))
+def check_extra_syzygies(d):
+    assert d >= 3
+    Bmons = list(set((RP3.irrelevant_ideal()^d).gens()))
 
-sub_inds = Subsets( range(len(pts)) ,15)
-debts_mat = [ matrix([ [ m(pts[i]) for m in Bmons] for i in ss]) for ss in sub_inds ]
-M = debts_mat[0].change_ring(K)
+    sub_inds = Subsets( range(len(pts)) ,15)
+    debts_mat = [ matrix([ [ m(pts[i]) for m in Bmons] for i in ss]) for ss in sub_inds ]
+    M = debts_mat[0].change_ring(K)
+    return len(Bmons) - M.right_kernel().dimension() == 15
 
-assert len(Bmons) - M.right_kernel().dimension() == 15
-print("Dimension of vanishing quartics is as expected.")
 
-#
-# Check for extra quintics
-Bmons = list(set((RP3.irrelevant_ideal()^5).gens()))
+for d in range(4,15):
+    assert check_extra_syzygies(d)
+    print("Dimension of vanishing degree " + str(d) +" forms is as expected.")
 
-sub_inds = Subsets( range(len(pts)) ,15)
-debts_mat = [ matrix([ [ m(pts[i]) for m in Bmons] for i in ss]) for ss in sub_inds ]
-M = debts_mat[0].change_ring(K)
+    
 
-assert len(Bmons) - M.right_kernel().dimension() == 15
-print("Dimension of vanishing quintics is as expected.")
+
+# Bmons = list(set((RP3.irrelevant_ideal()^4).gens()))
+
+# sub_inds = Subsets( range(len(pts)) ,15)
+# debts_mat = [ matrix([ [ m(pts[i]) for m in Bmons] for i in ss]) for ss in sub_inds ]
+# M = debts_mat[0].change_ring(K)
+
+# assert len(Bmons) - M.right_kernel().dimension() == 15
+# print("Dimension of vanishing quartics is as expected.")
+
+# #
+# # Check for extra quintics
+# Bmons = list(set((RP3.irrelevant_ideal()^5).gens()))
+
+# sub_inds = Subsets( range(len(pts)) ,15)
+# debts_mat = [ matrix([ [ m(pts[i]) for m in Bmons] for i in ss]) for ss in sub_inds ]
+# M = debts_mat[0].change_ring(K)
+
+# assert len(Bmons) - M.right_kernel().dimension() == 15
+# print("Dimension of vanishing quintics is as expected.")
 
 #
 # It appears that the Hilbert series has stabilized.
