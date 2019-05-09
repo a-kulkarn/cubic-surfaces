@@ -262,7 +262,7 @@ assert &and [ fvec in W : W in Ws];
 
 print "Computation terminated correctly. Linear forms in Steiner representation given by
       identifier `triederpaars`, up to scaling by a constant. 
-      Constants not computed due to lazyness.";
+      Constants presently not computed.";
 
 // Solving for the particular coefficients is linear algebra. We leave this to the reader of
 // the code.
