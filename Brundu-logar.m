@@ -24,8 +24,37 @@ f := 16384 * x0^3 + 32 * x0^2 * x1 + x0 * x1^2 + 8 * x1^3 + x0^2 * x2
   + 4 * x0 * x2 * x3 + 512 * x1 * x2 * x3 + 67108864 * x2^2 * x3
 	   + 8 * x0 * x3^2 + 32 * x2 * x3^2 + x3^3 + x1 * x3^2;
 
+// Geiger's data, example:
+no := 2;
+t  := 2;
+fileid := t;
+
+
+for no in [1..2] do
+for t in [2,3] do
+
+fileid:=t;
+    
+// Geiger's first cubic.
+if no eq 1 then
+    f := t^143*x0^3 + x0^2*x1 + t^64*x0^2*x2 + t^122*x0^2*x3
+	 + x0*x1^2 + t^2*x0*x1*x2 +x0*x1*x3 + t^15*x0*x2^2
+	 + t^55*x0*x2*x3 + t^107*x0*x3^2 + t^36*x1^3 + t^23*x1^2*x2
+	 + t^39*x1^2*x3 + t^16*x1*x2^2 + t^14*x1*x2*x3 + t^48*x1*x3^2
+	 + t^12*x2^3 + t^12*x2^2*x3 + t^49*x2*x3^2 + t^95*x3^3;
+end if;
+// Geiger's second cubic.
+if no eq 2 then
+	f := x0^3 + t^12*x0^2*x1 + t^30*x0^2*x2 + x0^2*x3
+	     + t^30*x0*x1^2 + t^12*x0*x1*x2 +t^3*x0*x1*x3 + t^145*x0*x2^2
+	     + t^54*x0*x2*x3 + t^10*x0*x3^2 + t^51*x1^3 + x1^2*x2
+	     + t^18*x1^2*x3 + t^123*x1*x2^2 + t^30*x1*x2*x3 + x1*x3^2
+	     + t^265*x2^3 + t^150*x2^2*x3 + t^80*x2*x3^2 + t^21*x3^3;
+end if;
+
+
 // Each line is expressed as a 4x2 matrix. i.e, Points_on_lines*Lines = 0.
-time lines, Qp := FormsOfpAdicLines(f);
+time lines, Qp := FormsOfpAdicLines(f : Place:=t);
 lset := LSet(lines);
 Transform := ConstructTransform(lset);
 
@@ -62,4 +91,16 @@ print "Valuations of Brundu-Logar coefficients:", [Valuation(x) : x in brunduLog
 
 // test stability of the computation.
 testpoly := fbl - &+[brunduLogarCoefficients[i]*brunduLogarStandardForms[i] : i in [1..5]]; 
-assert Min([Valuation(co) : co in Coefficients(testpoly)]) gt 9000;
+// assert Min([Valuation(co) : co in Coefficients(testpoly)]) gt 9000;
+
+// Write data.
+Write("Geiger-transform-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), Transform);
+Write("Geiger-BrunduLogar-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), fbl);
+Write("Geiger-lines-no:"*Sprint(no)**"-"*"p:"*Sprint(fileid), lines);
+
+// Write the Brundu-logar forms of the lines.
+BL_lines := [Transform*line : line in lines];
+Write("Geiger-BL-lines-no:"*Sprint(no)**"-"*"p:"*Sprint(fileid), BL_lines );
+
+end for;
+end for;
