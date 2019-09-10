@@ -30,31 +30,31 @@ t  := 2;
 fileid := t;
 
 
-for no in [1..2] do
-for t in [2,3] do
+for no in [1,2] do
+for tt in [2,3] do
 
-fileid:=t;
+fileid:=tt;
     
 // Geiger's first cubic.
 if no eq 1 then
-    f := t^143*x0^3 + x0^2*x1 + t^64*x0^2*x2 + t^122*x0^2*x3
-	 + x0*x1^2 + t^2*x0*x1*x2 +x0*x1*x3 + t^15*x0*x2^2
-	 + t^55*x0*x2*x3 + t^107*x0*x3^2 + t^36*x1^3 + t^23*x1^2*x2
-	 + t^39*x1^2*x3 + t^16*x1*x2^2 + t^14*x1*x2*x3 + t^48*x1*x3^2
-	 + t^12*x2^3 + t^12*x2^2*x3 + t^49*x2*x3^2 + t^95*x3^3;
+    f := tt^143*x0^3 + x0^2*x1 + tt^64*x0^2*x2 + tt^122*x0^2*x3
+	 + x0*x1^2 + tt^2*x0*x1*x2 +x0*x1*x3 + tt^15*x0*x2^2
+	 + tt^55*x0*x2*x3 + tt^107*x0*x3^2 + tt^36*x1^3 + tt^23*x1^2*x2
+	 + tt^39*x1^2*x3 + tt^16*x1*x2^2 + tt^14*x1*x2*x3 + tt^48*x1*x3^2
+	 + tt^12*x2^3 + tt^12*x2^2*x3 + tt^49*x2*x3^2 + tt^95*x3^3;
 end if;
 // Geiger's second cubic.
 if no eq 2 then
-	f := x0^3 + t^12*x0^2*x1 + t^30*x0^2*x2 + x0^2*x3
-	     + t^30*x0*x1^2 + t^12*x0*x1*x2 +t^3*x0*x1*x3 + t^145*x0*x2^2
-	     + t^54*x0*x2*x3 + t^10*x0*x3^2 + t^51*x1^3 + x1^2*x2
-	     + t^18*x1^2*x3 + t^123*x1*x2^2 + t^30*x1*x2*x3 + x1*x3^2
-	     + t^265*x2^3 + t^150*x2^2*x3 + t^80*x2*x3^2 + t^21*x3^3;
+	f := x0^3 + tt^12*x0^2*x1 + tt^30*x0^2*x2 + x0^2*x3
+	     + tt^30*x0*x1^2 + tt^12*x0*x1*x2 +tt^3*x0*x1*x3 + tt^145*x0*x2^2
+	     + tt^54*x0*x2*x3 + tt^10*x0*x3^2 + tt^51*x1^3 + x1^2*x2
+	     + tt^18*x1^2*x3 + tt^123*x1*x2^2 + tt^30*x1*x2*x3 + x1*x3^2
+	     + tt^265*x2^3 + tt^150*x2^2*x3 + tt^80*x2*x3^2 + tt^21*x3^3;
 end if;
 
 
 // Each line is expressed as a 4x2 matrix. i.e, Points_on_lines*Lines = 0.
-time lines, Qp := FormsOfpAdicLines(f : Place:=t);
+time lines, Qp := FormsOfpAdicLines(f : Place:=tt);
 lset := LSet(lines);
 Transform := ConstructTransform(lset);
 
@@ -96,11 +96,11 @@ testpoly := fbl - &+[brunduLogarCoefficients[i]*brunduLogarStandardForms[i] : i 
 // Write data.
 Write("Geiger-transform-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), Transform);
 Write("Geiger-BrunduLogar-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), fbl);
-Write("Geiger-lines-no:"*Sprint(no)**"-"*"p:"*Sprint(fileid), lines);
+Write("Geiger-lines-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), lines);
 
 // Write the Brundu-logar forms of the lines.
 BL_lines := [Transform*line : line in lines];
-Write("Geiger-BL-lines-no:"*Sprint(no)**"-"*"p:"*Sprint(fileid), BL_lines );
+Write("Geiger-BL-lines-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), BL_lines );
 
 end for;
 end for;
