@@ -94,13 +94,28 @@ testpoly := fbl - &+[brunduLogarCoefficients[i]*brunduLogarStandardForms[i] : i 
 // assert Min([Valuation(co) : co in Coefficients(testpoly)]) gt 9000;
 
 // Write data.
+/*
 Write("Geiger-transform-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), Transform);
 Write("Geiger-BrunduLogar-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), fbl);
 Write("Geiger-lines-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), lines);
+*/
 
 // Write the Brundu-logar forms of the lines.
 BL_lines := [Transform*line : line in lines];
-Write("Geiger-BL-lines-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), BL_lines );
+// Write("Geiger-BL-lines-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), BL_lines );
+
+// Write the Tropicalizations.
+
+// Take a 4x2 matrix and compute the tropicalizations of the minors.
+function TropicalizeLine(line)
+    return [Valuation(minor) : minor in Minors(line,2)];
+end function;
+
+trop_lines := [TropicalizeLine(line) : line in lines];
+BL_trop_lines := [TropicalizeLine(line) : line in BL_lines];
+
+Write("Geiger-lines-tropical-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), trop_lines);
+Write("Geiger-BL-lines-tropical-no:"*Sprint(no)*"-"*"p:"*Sprint(fileid), BL_trop_lines );
 
 end for;
 end for;
